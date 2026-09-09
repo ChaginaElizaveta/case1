@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Аутентификация</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            width: 400px;
+            max-width: 90%;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .message {
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: 10px;
+            text-align: center;
+            font-weight: 500;
+            display: none;
+        }
+
+        .message.show {
+            display: block;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .message.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .toggle-link {
+            text-align: center;
+            margin-top: 20px;
+            color: #667eea;
+            cursor: pointer;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .toggle-link:hover {
+            color: #764ba2;
+            text-decoration: underline;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 0.8s ease-in-out infinite;
+            vertical-align: middle;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        #userDetails {
+            text-align: center;
+            font-size: 18px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .test-info {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 10px;
+            margin-top: 20px;
+            font-size: 14px;
+            color: #666;
+            text-align: center;
+            border: 1px dashed #ccc;
+        }
+
+        .test-info strong {
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Форма регистрации -->
+        <form id="registerForm" onsubmit="handleRegistration(event)">
+            <h1>🔐 Регистрация</h1>
+            
+            <div class="form-group">
+                <label>Имя пользователя</label>
+                <input type="text" id="regUsername" placeholder="Введите логин" required minlength="3">
+            </div>
+            
+            <div class="form-group">
+                <label>Пароль</label>
+                <input type="password" id="regPassword" placeholder="Минимум 4 символа" required minlength="4">
+            </div>
+            
+            <button type="submit" id="registerBtn">Зарегистрироваться</button>
+            
+            <div id="registerMessage" class="message"></div>
+            
+            <div class="toggle-link" onclick="switchToLogin()">
+                Уже есть аккаунт? Войти
+            </div>
+        </form>
+
+        <!-- Форма входа -->
+        <form id="loginForm" class="hidden" onsubmit="handleLogin(event)">
+            <h1>🔑 Вход в систему</h1>
+            
+            <div class="form-group">
+                <label>Имя пользователя</label>
+                <input type="text" id="loginUsername" placeholder="Введите логин" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Пароль</label>
+                <input type="password" id="loginPassword" placeholder="Введите пароль" required>
+            </div>
+            
+            <button type="submit" id="loginBtn">Войти</button>
+            
+            <div id="loginMessage" class="message"></div>
+            
+            <div class="toggle-link" onclick="switchToRegister()">
+                Нет аккаунта? Зарегистрироваться
+            </div>
+        </form>
+
+        <!-- Информация о пользователе -->
+        <div id="userInfo" class="hidden">
+            <h1>👤 Добро пожаловать!</h1>
+            <div id="userDetails"></div>
+            <button onclick="logout()">Выйти из системы</button>
+        </div>
+
+        <!-- Информация для теста -->
+        <div class="test-info">
+            <strong>📝 Тестовый пользователь:</strong><br>
+            Логин: <strong>test_user</strong><br>
+            Пароль: <strong>test123</strong>
+        </div>
+    </div>
+
+    <script>
+        // ============================================
+        // КРИПТОГРАФИЯ (ХЕШИРОВАНИЕ НА КЛИЕНТЕ)
+        // ============================================
+        class CryptoHelper {
+            static generateSalt(length = 16) {
+                const array = new Uint8Array(length);
+                crypto.getRandomValues(array);
+                return Array.from(array)
+                    .map(b => b.toString(16).padStart(2, '0'))
+                    .join('');
+            }
+
+            static async hashPassword(password, salt) {
+                const encoder = new TextEncoder();
+                const passwordData = encoder.encode(password);
+                const saltData = encoder.encode(salt);
+
+                const keyMaterial = await crypto.subtle.importKey(
+                    'raw',
+                    passwordData,
+                    'PBKDF2',
+                    false,
+                    ['deriveBits']
+                );
+
+                const hashBuffer = await crypto.subtle.deriveBits(
+                    {
+                        name: 'PBKDF2',
+                        salt: saltData,
+                        iterations: 100000,
+                        hash: 'SHA-256'
+                    },
+                    keyMaterial,
+                    256
+                );
+
+                const hashArray = Array.from(new Uint8Array(hashBuffer));
+                return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+            }
+
+            static async preparePassword(password) {
+                const salt = this.generateSalt();
+                const hash = await this.hashPassword(password, salt);
+                return { salt, hash };
+            }
+
+            static async hashWithSalt(password, salt) {
+                return await this.hashPassword(password, salt);
+            }
+        }
+
+        // ============================================
+        // УПРАВЛЕНИЕ ФОРМАМИ
+        // ============================================
+        let currentUser = null;
+
+        function switchToLogin() {
+            document.getElementById('registerForm').classList.add('hidden');
+            document.getElementById('loginForm').classList.remove('hidden');
+            document.getElementById('userInfo').classList.add('hidden');
+            clearMessages();
+        }
+
+        function switchToRegister() {
+            document.getElementById('registerForm').classList.remove('hidden');
+            document.getElementById('loginForm').classList.add('hidden');
+            document.getElementById('userInfo').classList.add('hidden');
+            clearMessages();
+        }
+
+        function clearMessages() {
+            document.querySelectorAll('.message').forEach(el => {
+                el.textContent = '';
+                el.className = 'message';
+            });
+        }
+
+        function showMessage(element, text, type) {
+            element.textContent = text;
+            element.className = `message show ${type}`;
+        }
+
+        // ============================================
+        // РЕГИСТРАЦИЯ
+        // ============================================
+        async function handleRegistration(event) {
+            event.preventDefault();
+
+            const username = document.getElementById('regUsername').value.trim();
+            const password = document.getElementById('regPassword').value;
+            const messageDiv = document.getElementById('registerMessage');
+            const btn = document.getElementById('registerBtn');
+
+            if (!username || !password) {
+                showMessage(messageDiv, 'Заполните все поля', 'error');
+                return false;
+            }
+
+            if (username.length < 3) {
+                showMessage(messageDiv, 'Логин должен содержать минимум 3 символа', 'error');
+                return false;
+            }
+
+            if (password.length < 4) {
+                showMessage(messageDiv, 'Пароль должен содержать минимум 4 символа', 'error');
+                return false;
+            }
+
+            try {
+                btn.disabled = true;
+                btn.innerHTML = '<span class="spinner"></span> Регистрация...';
+
+                const { salt, hash } = await CryptoHelper.preparePassword(password);
+                console.log('🔐 Пароль захэширован на клиенте');
+
+                const response = await fetch('/api/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        username: username,
+                        passwordHash: hash,
+                        salt: salt
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showMessage(messageDiv, '✅ ' + result.message, 'success');
+                    document.getElementById('regUsername').value = '';
+                    document.getElementById('regPassword').value = '';
+                    
+                    setTimeout(() => {
+                        switchToLogin();
+                        showMessage(
+                            document.getElementById('loginMessage'),
+                            'Теперь вы можете войти в систему',
+                            'success'
+                        );
+                    }, 1500);
+                } else {
+                    showMessage(messageDiv, '❌ ' + result.message, 'error');
+                }
+            } catch (error) {
+                console.error('Ошибка:', error);
+                showMessage(messageDiv, '❌ Ошибка соединения с сервером', 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = 'Зарегистрироваться';
+            }
+
+            return false;
+        }
+
+        // ============================================
+        // ВХОД (АУТЕНТИФИКАЦИЯ)
+        // ============================================
+        async function handleLogin(event) {
+            event.preventDefault();
+
+            const username = document.getElementById('loginUsername').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            const messageDiv = document.getElementById('loginMessage');
+            const btn = document.getElementById('loginBtn');
+
+            if (!username || !password) {
+                showMessage(messageDiv, 'Заполните все поля', 'error');
+                return false;
+            }
+
+            try {
+                btn.disabled = true;
+                btn.innerHTML = '<span class="spinner"></span> Вход...';
+
+                const saltResponse = await fetch(`/api/get-salt?username=${encodeURIComponent(username)}`);
+                const saltData = await saltResponse.json();
+
+                if (!saltData.success) {
+                    showMessage(messageDiv, '❌ ' + saltData.message, 'error');
+                    btn.disabled = false;
+                    btn.innerHTML = 'Войти';
+                    return false;
+                }
+
+                console.log('🔑 Соль получена с сервера');
+
+                const hash = await CryptoHelper.hashWithSalt(password, saltData.salt);
+                console.log('🔐 Пароль захэширован с серверной солью');
+
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        username: username,
+                        passwordHash: hash
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    currentUser = result.user;
+                    showMessage(messageDiv, '✅ ' + result.message, 'success');
+
+                    document.getElementById('userDetails').innerHTML = `
+                        <strong>👤 Имя:</strong> ${result.user.username}<br>
+                        <strong>🆔 ID:</strong> ${result.user.id}
+                    `;
+                    document.getElementById('userInfo').classList.remove('hidden');
+                    document.getElementById('loginForm').classList.add('hidden');
+                    document.getElementById('registerForm').classList.add('hidden');
+                    
+                    document.getElementById('loginPassword').value = '';
+                } else {
+                    showMessage(messageDiv, '❌ ' + result.message, 'error');
+                }
+            } catch (error) {
+                console.error('Ошибка:', error);
+                showMessage(messageDiv, '❌ Ошибка соединения с сервером', 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = 'Войти';
+            }
+
+            return false;
+        }
+
+        // ============================================
+        // ВЫХОД
+        // ============================================
+        function logout() {
+            currentUser = null;
+            document.getElementById('userInfo').classList.add('hidden');
+            switchToLogin();
+            showMessage(
+                document.getElementById('loginMessage'),
+                'Вы вышли из системы',
+                'info'
+            );
+        }
+
+        // ============================================
+        // ЗАГРУЗКА СТРАНИЦЫ
+        // ============================================
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('✅ Страница загружена');
+            console.log('📝 Тестовый пользователь: test_user / test123');
+        });
+    </script>
+</body>
+</html>
