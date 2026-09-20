@@ -1,0 +1,21 @@
+# База данных
+users.db
+*.db
+*.sqlite
+
+# Виртуальное окружение
+venv/
+env/
+ENV/
+
+# Python
+__pycache__/
+*.pyc
+
+# IDE
+.vscode/
+.idea/
+
+# ОС
+.DS_Store
+Thumbs.db

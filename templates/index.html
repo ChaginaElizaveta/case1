@@ -5,201 +5,163 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Аутентификация</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', Tahoma, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
+            padding: 20px;
         }
-
         .container {
             background: white;
             padding: 40px;
             border-radius: 20px;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            width: 400px;
-            max-width: 90%;
+            width: 440px;
+            max-width: 100%;
         }
-
-        h1 {
-            text-align: center;
-            color: #333;
-            margin-bottom: 30px;
-            font-size: 28px;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 5px;
-            color: #555;
-            font-weight: 500;
-        }
-
+        h1 { text-align: center; color: #333; margin-bottom: 30px; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 5px; color: #555; font-weight: 500; }
         input {
-            width: 100%;
-            padding: 12px;
+            width: 100%; padding: 12px;
             border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            font-size: 16px;
+            border-radius: 10px; font-size: 16px;
             transition: border-color 0.3s;
         }
-
-        input:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-
+        input:focus { outline: none; border-color: #667eea; }
+        input.weak { border-color: #dc3545; }
+        input.medium { border-color: #ffc107; }
+        input.strong { border-color: #28a745; }
         button {
-            width: 100%;
-            padding: 14px;
+            width: 100%; padding: 14px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
+            color: white; border: none; border-radius: 10px;
+            font-size: 16px; font-weight: 600; cursor: pointer;
+            transition: transform 0.2s;
         }
-
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
-        }
-
-        button:active {
-            transform: translateY(0);
-        }
-
-        button:disabled {
-            opacity: 0.7;
-            cursor: not-allowed;
-        }
-
+        button:hover { transform: translateY(-2px); }
+        button:disabled { opacity: 0.7; cursor: not-allowed; }
         .message {
-            margin-top: 15px;
+            margin-top: 15px; padding: 12px;
+            border-radius: 10px; text-align: center;
+            display: none; font-weight: 500; font-size: 14px;
+        }
+        .message.show { display: block; }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .info { background: #d1ecf1; color: #0c5460; }
+        .toggle-link {
+            text-align: center; margin-top: 20px;
+            color: #667eea; cursor: pointer;
+        }
+        .hidden { display: none !important; }
+        .spinner {
+            display: inline-block; width: 20px; height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%; border-top-color: #fff;
+            animation: spin 0.8s infinite; vertical-align: middle;
+            margin-right: 8px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .password-strength {
+            margin-top: 10px;
             padding: 12px;
             border-radius: 10px;
-            text-align: center;
-            font-weight: 500;
+            background: #f8f9fa;
             display: none;
         }
-
-        .message.show {
+        .password-strength.show { display: block; }
+        .strength-bar {
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+        .strength-bar-fill {
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s, background 0.3s;
+            border-radius: 4px;
+        }
+        .strength-text {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        .strength-details {
+            font-size: 12px;
+            color: #666;
+            line-height: 1.5;
+        }
+        .strength-details .crack-time {
+            color: #0c5460;
+            background: #d1ecf1;
+            padding: 6px 8px;
+            border-radius: 6px;
+            margin-top: 6px;
             display: block;
         }
-
-        .message.success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-
-        .message.error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-
-        .message.info {
-            background: #d1ecf1;
-            color: #0c5460;
-            border: 1px solid #bee5eb;
-        }
-
-        .toggle-link {
-            text-align: center;
-            margin-top: 20px;
-            color: #667eea;
-            cursor: pointer;
-            font-weight: 500;
-            transition: color 0.3s;
-        }
-
-        .toggle-link:hover {
-            color: #764ba2;
-            text-decoration: underline;
-        }
-
-        .hidden {
-            display: none !important;
-        }
-
-        .spinner {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top-color: #fff;
-            animation: spin 0.8s ease-in-out infinite;
-            vertical-align: middle;
-            margin-right: 10px;
-        }
-
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
+        .strength-details .warning {
+            color: #856404;
+            background: #fff3cd;
+            padding: 6px 8px;
+            border-radius: 6px;
+            margin-top: 6px;
+            display: block;
         }
 
         #userDetails {
             text-align: center;
-            font-size: 18px;
+            font-size: 20px;
             padding: 20px;
             background: #f8f9fa;
             border-radius: 10px;
             margin: 20px 0;
-        }
-
-        .test-info {
-            background: #f8f9fa;
-            padding: 12px;
-            border-radius: 10px;
-            margin-top: 20px;
-            font-size: 14px;
-            color: #666;
-            text-align: center;
-            border: 1px dashed #ccc;
-        }
-
-        .test-info strong {
             color: #333;
         }
+        .security-badge {
+            background: #e7f3ff; color: #0056b3;
+            padding: 8px; border-radius: 8px;
+            font-size: 12px; text-align: center;
+            margin-bottom: 20px;
+        }
     </style>
+
+    <!-- zxcvbn на клиенте -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/zxcvbn/4.4.2/zxcvbn.js"></script>
 </head>
 <body>
     <div class="container">
         <!-- Форма регистрации -->
         <form id="registerForm" onsubmit="handleRegistration(event)">
             <h1>🔐 Регистрация</h1>
-            
+
             <div class="form-group">
                 <label>Имя пользователя</label>
                 <input type="text" id="regUsername" placeholder="Введите логин" required minlength="3">
             </div>
-            
+
             <div class="form-group">
                 <label>Пароль</label>
-                <input type="password" id="regPassword" placeholder="Минимум 4 символа" required minlength="4">
+                <input type="password" id="regPassword" placeholder="Введите пароль" required minlength="8">
+                <div id="passwordStrength" class="password-strength">
+                    <div class="strength-bar">
+                        <div id="strengthBarFill" class="strength-bar-fill"></div>
+                    </div>
+                    <div id="strengthText" class="strength-text"></div>
+                    <div id="strengthDetails" class="strength-details"></div>
+                </div>
             </div>
-            
+
             <button type="submit" id="registerBtn">Зарегистрироваться</button>
-            
             <div id="registerMessage" class="message"></div>
-            
+
             <div class="toggle-link" onclick="switchToLogin()">
                 Уже есть аккаунт? Войти
             </div>
@@ -207,46 +169,35 @@
 
         <!-- Форма входа -->
         <form id="loginForm" class="hidden" onsubmit="handleLogin(event)">
-            <h1>🔑 Вход в систему</h1>
-            
+            <h1>🔑 Вход</h1>
+
             <div class="form-group">
                 <label>Имя пользователя</label>
                 <input type="text" id="loginUsername" placeholder="Введите логин" required>
             </div>
-            
+
             <div class="form-group">
                 <label>Пароль</label>
                 <input type="password" id="loginPassword" placeholder="Введите пароль" required>
             </div>
-            
+
             <button type="submit" id="loginBtn">Войти</button>
-            
             <div id="loginMessage" class="message"></div>
-            
+
             <div class="toggle-link" onclick="switchToRegister()">
                 Нет аккаунта? Зарегистрироваться
             </div>
         </form>
 
-        <!-- Информация о пользователе -->
+        <!-- Профиль -->
         <div id="userInfo" class="hidden">
             <h1>👤 Добро пожаловать!</h1>
             <div id="userDetails"></div>
-            <button onclick="logout()">Выйти из системы</button>
-        </div>
-
-        <!-- Информация для теста -->
-        <div class="test-info">
-            <strong>📝 Тестовый пользователь:</strong><br>
-            Логин: <strong>test_user</strong><br>
-            Пароль: <strong>test123</strong>
+            <button onclick="logout()">Выйти</button>
         </div>
     </div>
 
     <script>
-        // ============================================
-        // КРИПТОГРАФИЯ (ХЕШИРОВАНИЕ НА КЛИЕНТЕ)
-        // ============================================
         class CryptoHelper {
             static generateSalt(length = 16) {
                 const array = new Uint8Array(length);
@@ -262,11 +213,7 @@
                 const saltData = encoder.encode(salt);
 
                 const keyMaterial = await crypto.subtle.importKey(
-                    'raw',
-                    passwordData,
-                    'PBKDF2',
-                    false,
-                    ['deriveBits']
+                    'raw', passwordData, 'PBKDF2', false, ['deriveBits']
                 );
 
                 const hashBuffer = await crypto.subtle.deriveBits(
@@ -289,15 +236,8 @@
                 const hash = await this.hashPassword(password, salt);
                 return { salt, hash };
             }
-
-            static async hashWithSalt(password, salt) {
-                return await this.hashPassword(password, salt);
-            }
         }
 
-        // ============================================
-        // УПРАВЛЕНИЕ ФОРМАМИ
-        // ============================================
         let currentUser = null;
 
         function switchToLogin() {
@@ -327,6 +267,68 @@
         }
 
         // ============================================
+        // ИНДИКАТОР СИЛЫ ПАРОЛЯ (zxcvbn локально)
+        // ============================================
+        let checkPasswordTimer = null;
+
+        document.getElementById('regPassword').addEventListener('input', function () {
+            const password = this.value;
+            const strengthDiv = document.getElementById('passwordStrength');
+            const barFill = document.getElementById('strengthBarFill');
+            const strengthText = document.getElementById('strengthText');
+            const strengthDetails = document.getElementById('strengthDetails');
+
+            clearTimeout(checkPasswordTimer);
+
+            if (!password) {
+                strengthDiv.classList.remove('show');
+                this.classList.remove('weak', 'medium', 'strong');
+                return;
+            }
+
+            checkPasswordTimer = setTimeout(() => {
+                const result = zxcvbn(password);
+                const score = result.score;
+
+                strengthDiv.classList.add('show');
+
+                const colors = ['#dc3545', '#dc3545', '#ffc107', '#28a745', '#28a745'];
+                const percents = [20, 40, 60, 80, 100];
+                const labels = [
+                    'Очень слабый', 'Слабый', 'Средний', 'Надежный', 'Очень надежный'
+                ];
+
+                barFill.style.width = percents[score] + '%';
+                barFill.style.background = colors[score];
+                strengthText.textContent = labels[score] + ` (${score}/4)`;
+                strengthText.style.color = colors[score];
+
+                let detailsHTML = '';
+                if (result.crack_times_display &&
+                    result.crack_times_display.offline_slow_hashing_1e4_per_second) {
+                    detailsHTML += `<span class="crack-time">⏱️ Время взлома: ${
+                        result.crack_times_display.offline_slow_hashing_1e4_per_second
+                    }</span>`;
+                }
+                if (result.feedback && result.feedback.warning) {
+                    detailsHTML += `<span class="warning">⚠️ ${result.feedback.warning}</span>`;
+                }
+                if (result.feedback && result.feedback.suggestions &&
+                    result.feedback.suggestions.length > 0) {
+                    detailsHTML += `<div style="margin-top: 6px;">💡 ${
+                        result.feedback.suggestions.join('. ')
+                    }</div>`;
+                }
+                strengthDetails.innerHTML = detailsHTML;
+
+                this.classList.remove('weak', 'medium', 'strong');
+                if (score <= 1) this.classList.add('weak');
+                else if (score === 2) this.classList.add('medium');
+                else this.classList.add('strong');
+            }, 300);
+        });
+
+        // ============================================
         // РЕГИСТРАЦИЯ
         // ============================================
         async function handleRegistration(event) {
@@ -343,12 +345,22 @@
             }
 
             if (username.length < 3) {
-                showMessage(messageDiv, 'Логин должен содержать минимум 3 символа', 'error');
+                showMessage(messageDiv, 'Логин минимум 3 символа', 'error');
                 return false;
             }
 
-            if (password.length < 4) {
-                showMessage(messageDiv, 'Пароль должен содержать минимум 4 символа', 'error');
+            if (password.length < 8) {
+                showMessage(messageDiv, 'Пароль минимум 8 символов', 'error');
+                return false;
+            }
+
+            const strength = zxcvbn(password);
+            if (strength.score < 3) {
+                let msg = `⚠️ Слабый пароль (оценка ${strength.score}/4)`;
+                if (strength.feedback && strength.feedback.warning) {
+                    msg += '. ' + strength.feedback.warning;
+                }
+                showMessage(messageDiv, msg, 'error');
                 return false;
             }
 
@@ -357,17 +369,14 @@
                 btn.innerHTML = '<span class="spinner"></span> Регистрация...';
 
                 const { salt, hash } = await CryptoHelper.preparePassword(password);
-                console.log('🔐 Пароль захэширован на клиенте');
 
                 const response = await fetch('/api/register', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        username: username,
+                        username,
                         passwordHash: hash,
-                        salt: salt
+                        salt
                     })
                 });
 
@@ -377,12 +386,13 @@
                     showMessage(messageDiv, '✅ ' + result.message, 'success');
                     document.getElementById('regUsername').value = '';
                     document.getElementById('regPassword').value = '';
-                    
+                    document.getElementById('passwordStrength').classList.remove('show');
+
                     setTimeout(() => {
                         switchToLogin();
                         showMessage(
                             document.getElementById('loginMessage'),
-                            'Теперь вы можете войти в систему',
+                            'Теперь вы можете войти',
                             'success'
                         );
                     }, 1500);
@@ -390,7 +400,6 @@
                     showMessage(messageDiv, '❌ ' + result.message, 'error');
                 }
             } catch (error) {
-                console.error('Ошибка:', error);
                 showMessage(messageDiv, '❌ Ошибка соединения с сервером', 'error');
             } finally {
                 btn.disabled = false;
@@ -401,7 +410,7 @@
         }
 
         // ============================================
-        // ВХОД (АУТЕНТИФИКАЦИЯ)
+        // ВХОД
         // ============================================
         async function handleLogin(event) {
             event.preventDefault();
@@ -420,29 +429,29 @@
                 btn.disabled = true;
                 btn.innerHTML = '<span class="spinner"></span> Вход...';
 
-                const saltResponse = await fetch(`/api/get-salt?username=${encodeURIComponent(username)}`);
-                const saltData = await saltResponse.json();
+                const challengeResponse = await fetch(
+                    `/api/get-challenge?username=${encodeURIComponent(username)}`
+                );
+                const challengeData = await challengeResponse.json();
 
-                if (!saltData.success) {
-                    showMessage(messageDiv, '❌ ' + saltData.message, 'error');
-                    btn.disabled = false;
-                    btn.innerHTML = 'Войти';
+                if (!challengeData.success) {
+                    showMessage(messageDiv, '❌ ' + challengeData.message, 'error');
                     return false;
                 }
 
-                console.log('🔑 Соль получена с сервера');
-
-                const hash = await CryptoHelper.hashWithSalt(password, saltData.salt);
-                console.log('🔐 Пароль захэширован с серверной солью');
+                const hash = await CryptoHelper.hashPassword(
+                    password,
+                    challengeData.salt
+                );
 
                 const response = await fetch('/api/login', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        username: username,
-                        passwordHash: hash
+                        username,
+                        passwordHash: hash,
+                        challenge: challengeData.challenge,
+                        timestamp: challengeData.timestamp
                     })
                 });
 
@@ -452,20 +461,17 @@
                     currentUser = result.user;
                     showMessage(messageDiv, '✅ ' + result.message, 'success');
 
-                    document.getElementById('userDetails').innerHTML = `
-                        <strong>👤 Имя:</strong> ${result.user.username}<br>
-                        <strong>🆔 ID:</strong> ${result.user.id}
-                    `;
+                    document.getElementById('userDetails').innerHTML =
+                        `👋 Здравствуйте, <strong>${result.user.username}</strong>!`;
+
                     document.getElementById('userInfo').classList.remove('hidden');
                     document.getElementById('loginForm').classList.add('hidden');
                     document.getElementById('registerForm').classList.add('hidden');
-                    
                     document.getElementById('loginPassword').value = '';
                 } else {
                     showMessage(messageDiv, '❌ ' + result.message, 'error');
                 }
             } catch (error) {
-                console.error('Ошибка:', error);
                 showMessage(messageDiv, '❌ Ошибка соединения с сервером', 'error');
             } finally {
                 btn.disabled = false;
@@ -482,20 +488,8 @@
             currentUser = null;
             document.getElementById('userInfo').classList.add('hidden');
             switchToLogin();
-            showMessage(
-                document.getElementById('loginMessage'),
-                'Вы вышли из системы',
-                'info'
-            );
+            showMessage(document.getElementById('loginMessage'), 'Вы вышли из системы', 'info');
         }
-
-        // ============================================
-        // ЗАГРУЗКА СТРАНИЦЫ
-        // ============================================
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('✅ Страница загружена');
-            console.log('📝 Тестовый пользователь: test_user / test123');
-        });
     </script>
 </body>
 </html>
