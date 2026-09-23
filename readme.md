@@ -19,6 +19,7 @@
 case1/
 ├── app.py
 ├── requirements.txt
+├──tests/
 ├── templates/
 │   └── index.html
 ├── users.db

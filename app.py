@@ -52,7 +52,7 @@ def cleanup_old_challenges():
     cursor = conn.cursor()
     cursor.execute('''
         DELETE FROM challenges
-        WHERE created_at < datetime('now', '-5 minutes')
+        WHERE created_at < datetime('now', '-2 minutes')
     ''')
     conn.commit()
     conn.close()
@@ -139,7 +139,7 @@ def get_challenge():
         'salt': user['salt'],
         'challenge': challenge,
         'timestamp': timestamp,
-        'expiresIn': 300
+        'expiresIn': 120
     })
 
 @app.route('/api/login', methods=['POST'])
@@ -156,7 +156,7 @@ def login():
 
     # Проверка timestamp
     current_time = int(time.time())
-    if abs(current_time - int(timestamp)) > 300:
+    if abs(current_time - int(timestamp)) > 120:
         return jsonify({'success': False, 'message': 'Запрос устарел'}), 401
 
     conn = get_db()
